@@ -64,7 +64,12 @@ function PasswordField({ label, value, onChange }) {
     <label className="field auth-password-field">
       <span>{label}</span>
       <div className="auth-password-wrap">
-        <input type={showPassword ? "text" : "password"} value={value} onChange={onChange} />
+        <input 
+          type={showPassword ? "text" : "password"} 
+          value={value} 
+          onChange={onChange} 
+          autoComplete="current-password"
+        />
         <button type="button" className="auth-password-toggle" onClick={() => setShowPassword((current) => !current)}>
           {showPassword ? "Hide" : "Show"}
         </button>
@@ -146,7 +151,7 @@ function AuthLayout({ title, subtitle, children, cardClassName = "", showcaseSty
 export function LoginPage() {
   const navigate = useNavigate();
   const { isAuthenticated, login } = useAuth();
-  const [form, setForm] = useState({ email: "aarav@student.best", password: "Password123" });
+  const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const googleConfig = useAuthOptions();
