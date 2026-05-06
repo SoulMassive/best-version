@@ -4,14 +4,26 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
-    "dev:demo": "concurrently \"cross-env USE_IN_MEMORY_DB=true AUTO_SEED_DEMO=true npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
-    "stop:dev": "powershell -NoProfile -Command \"$ports = 5000,4173; $connections = Get-NetTCPConnection -LocalPort $ports -ErrorAction SilentlyContinue | Select-Object -Unique OwningProcess; foreach ($connection in $connections) { if ($connection.OwningProcess -gt 0) { Stop-Process -Id $connection.OwningProcess -Force -ErrorAction SilentlyContinue } }\"",
     "build": "npm --prefix frontend run build",
-    "seed": "npm --prefix backend run seed",
-    "seed:demo": "cross-env USE_IN_MEMORY_DB=true npm --prefix backend run seed"
+    "start": "node backend/src/server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.4.1",
+    "express-validator": "^7.2.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.6.2",
+    "morgan": "^1.10.0",
+    "nodemailer": "^8.0.5",
+    "bson": "^6.8.0"
   },
   "devDependencies": {
     "concurrently": "^9.0.1",
-    "cross-env": "^7.0.3"
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.1.4"
   }
 }
