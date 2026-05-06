@@ -14,9 +14,11 @@ export function createApp() {
   app.use(
     cors({
       origin(origin, callback) {
-        if (!origin || env.clientUrls.includes(origin)) {
+        // Allow same-origin (browser calls to /api) or matches CLIENT_URL
+        if (!origin || env.clientUrls.some(url => origin.startsWith(url))) {
           return callback(null, true);
         }
+        console.error(`CORS Blocked: Origin ${origin} not in`, env.clientUrls);
         return callback(new Error("Origin not allowed by CORS"));
       },
       credentials: true,
