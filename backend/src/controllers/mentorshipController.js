@@ -4,8 +4,12 @@ import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendResponse } from "../utils/response.js";
 
-export const getMentors = asyncHandler(async (_req, res) => {
-  const mentors = await Mentor.find().populate("user").sort({ featured: -1, createdAt: -1 });
+export const getMentors = asyncHandler(async (req, res) => {
+  const { expertise } = req.query;
+  const filter = {};
+  if (expertise) filter.expertise = { $regex: expertise, $options: "i" };
+
+  const mentors = await Mentor.find(filter).populate("user").sort({ featured: -1, createdAt: -1 });
   return sendResponse(res, {
     message: "Mentors fetched",
     data: mentors,
@@ -27,6 +31,15 @@ export const requestMentorship = asyncHandler(async (req, res) => {
   const mentor = await Mentor.findById(req.params.mentorId);
   if (!mentor) {
     throw new ApiError(404, "Mentor not found");
+  }
+
+  const existing = await MentorshipRequest.findOne({
+    mentor: mentor._id,
+    user: req.user._id,
+    status: "requested",
+  });
+  if (existing) {
+    throw new ApiError(409, "You already have a pending request with this mentor");
   }
 
   const request = await MentorshipRequest.create({

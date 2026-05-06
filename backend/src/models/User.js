@@ -50,6 +50,21 @@ const userSchema = new mongoose.Schema(
     interests: [String],
     badges: [String],
     achievements: [achievementSchema],
+    skillScore: { type: Number, default: 0 },
+    enrolledCourses: [
+      {
+        courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+        progress: { type: Number, default: 0 },
+        enrolledAt: { type: Date, default: Date.now },
+        _id: false,
+      },
+    ],
+    reusablePitch: String,
+    notificationPreferences: {
+      emailOnMentorshipRequest: { type: Boolean, default: true },
+      emailOnJobMatch: { type: Boolean, default: true },
+      communityDigest: { type: Boolean, default: true },
+    },
     stats: {
       xp: { type: Number, default: 0 },
       streak: { type: Number, default: 0 },

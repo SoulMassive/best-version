@@ -5,12 +5,24 @@ import { ShareButtons } from "../../components/ui/ShareButtons";
 import { Button, Card, LoadingState, ProgressBar, SectionHeader, Stat } from "../../components/ui/UI";
 
 export function DashboardPage() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["dashboard"],
     queryFn: () => fetcher("/dashboard"),
+    retry: 1,
   });
 
   if (isLoading) return <LoadingState label="Loading dashboard..." />;
+
+  if (isError || !data) {
+    return (
+      <div className="stack-xl">
+        <Card>
+          <SectionHeader eyebrow="Dashboard" title="Could not load dashboard" description="There was a problem connecting to the server. Please make sure the backend is running and try refreshing the page." />
+          <Button onClick={() => window.location.reload()}>Reload</Button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="stack-xl">
@@ -26,17 +38,17 @@ export function DashboardPage() {
       </section>
 
       <section className="stats-grid">
-        <Stat label="XP" value={data.progressOverview.xp} helper="Keep compounding progress" />
-        <Stat label="Streak" value={`${data.progressOverview.streak} days`} helper="Momentum matters" />
-        <Stat label="Courses" value={data.progressOverview.completedCourses} helper="Completed courses" />
-        <Stat label="Projects" value={data.progressOverview.projectsBuilt} helper="Portfolio-ready work" />
+        <Stat label="XP" value={data.progressOverview?.xp ?? 0} helper="Keep compounding progress" />
+        <Stat label="Streak" value={`${data.progressOverview?.streak ?? 0} days`} helper="Momentum matters" />
+        <Stat label="Courses" value={data.progressOverview?.completedCourses ?? 0} helper="Completed courses" />
+        <Stat label="Projects" value={data.progressOverview?.projectsBuilt ?? 0} helper="Portfolio-ready work" />
       </section>
 
       <section className="grid-two">
         <Card>
           <SectionHeader eyebrow="Recommendations" title="Best next moves" />
           <div className="stack">
-            {data.recommendations.map((item) => (
+            {(data.recommendations || []).map((item) => (
               <div className="list-row" key={item.title}>
                 <div>
                   <strong>{item.title}</strong>
@@ -75,7 +87,7 @@ export function DashboardPage() {
         <Card>
           <SectionHeader eyebrow="Learning" title="Active courses" action={<Link to="/courses">See all</Link>} />
           <div className="stack">
-            {data.activeCourses.map((item) => (
+            {(data.activeCourses || []).map((item) => (
               <div className="course-row" key={item._id}>
                 <div>
                   <strong>{item.course.title}</strong>
@@ -93,7 +105,7 @@ export function DashboardPage() {
         <Card>
           <SectionHeader eyebrow="Projects" title="Build tracker" action={<Link to="/projects">Open studio</Link>} />
           <div className="stack">
-            {data.activeProjects.map((item) => (
+            {(data.activeProjects || []).map((item) => (
               <div className="list-row" key={item._id}>
                 <div>
                   <strong>{item.title}</strong>
@@ -110,7 +122,7 @@ export function DashboardPage() {
         <Card>
           <SectionHeader eyebrow="Competitions" title="Live and upcoming" />
           <div className="stack">
-            {data.competitions.map((item) => (
+            {(data.competitions || []).map((item) => (
               <div key={item._id}>
                 <strong>{item.title}</strong>
                 <p>
@@ -123,11 +135,11 @@ export function DashboardPage() {
         <Card>
           <SectionHeader eyebrow="Mentors" title="Good matches" />
           <div className="stack">
-            {data.mentors.map((item) => (
+            {(data.mentors || []).map((item) => (
               <div className="person-row" key={item._id}>
-                <img src={item.user.avatar} alt={item.user.name} />
+                <img src={item.user?.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${item.user?.name}`} alt={item.user?.name} />
                 <div>
-                  <strong>{item.user.name}</strong>
+                  <strong>{item.user?.name}</strong>
                   <p>{item.bio}</p>
                 </div>
               </div>
@@ -137,7 +149,7 @@ export function DashboardPage() {
         <Card>
           <SectionHeader eyebrow="Notifications" title="Recent updates" />
           <div className="stack">
-            {data.notifications.map((item) => (
+            {(data.notifications || []).map((item) => (
               <div key={item._id}>
                 <strong>{item.title}</strong>
                 <p>{item.body}</p>
