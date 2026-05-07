@@ -1,11 +1,10 @@
 {
   "version": 2,
-  "buildCommand": "npm --prefix frontend run build",
+  "buildCommand": "npm --prefix frontend run build && cp -r frontend/dist/* .",
   "installCommand": "npm install && npm --prefix frontend install && npm --prefix backend install",
-  "outputDirectory": "frontend/dist",
   "functions": {
     "api/index.js": {
-      "includeFiles": ["backend/src/**"]
+      "includeFiles": "backend/src/**"
     }
   },
   "rewrites": [
