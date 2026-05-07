@@ -11,17 +11,13 @@ export function createApp() {
   const app = express();
   app.set("trust proxy", 1);
 
-  app.use(helmet());
+  // Temporarily disabled for debugging
+  // app.use(helmet());
   app.use(
     cors({
       origin(origin, callback) {
-        // Allow same-origin, development, or matches CLIENT_URL
-        const isAllowed =
-          !origin ||
-          env.nodeEnv === "development" ||
-          env.clientUrls.some((url) => origin.startsWith(url));
-
-        if (isAllowed) {
+        // More permissive for production debugging
+        if (!origin || env.nodeEnv === "development" || origin.includes("vercel.app") || env.clientUrls.some(url => origin.startsWith(url))) {
           return callback(null, true);
         }
         console.error(`CORS Blocked: Origin ${origin} not in`, env.clientUrls);
@@ -33,6 +29,8 @@ export function createApp() {
   app.use(express.json({ limit: "1mb" }));
   app.use(express.urlencoded({ extended: true }));
   app.use(morgan("dev"));
+  // Temporarily disabled for debugging
+  /*
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000,
@@ -41,6 +39,7 @@ export function createApp() {
       legacyHeaders: false,
     })
   );
+  */
 
   app.get("/api/health", (_req, res) => {
     res.json({

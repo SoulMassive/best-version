@@ -26,9 +26,11 @@ export default async function handler(req, res) {
     
     await ensureConnected();
     
+    // Add debug headers to help troubleshoot on the client side
+    res.setHeader('X-Vercel-Proxy-URL', req.url || 'unknown');
+    res.setHeader('X-Vercel-Proxy-Method', req.method || 'unknown');
+    
     // Proxy the request to the Express app
-    // We don't need to modify req.url here as Express will handle it,
-    // but we ensure the app is called correctly.
     return app(req, res);
   } catch (error) {
     console.error("Serverless Function Error:", {
