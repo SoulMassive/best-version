@@ -9,13 +9,19 @@ import { router as apiRouter } from "./routes/index.js";
 
 export function createApp() {
   const app = express();
+  app.set("trust proxy", 1);
 
   app.use(helmet());
   app.use(
     cors({
       origin(origin, callback) {
-        // Allow same-origin (browser calls to /api) or matches CLIENT_URL
-        if (!origin || env.clientUrls.some(url => origin.startsWith(url))) {
+        // Allow same-origin, development, or matches CLIENT_URL
+        const isAllowed =
+          !origin ||
+          env.nodeEnv === "development" ||
+          env.clientUrls.some((url) => origin.startsWith(url));
+
+        if (isAllowed) {
           return callback(null, true);
         }
         console.error(`CORS Blocked: Origin ${origin} not in`, env.clientUrls);

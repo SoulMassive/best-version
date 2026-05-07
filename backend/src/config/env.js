@@ -12,10 +12,15 @@ export const env = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
   clientUrl: process.env.CLIENT_URL || "http://127.0.0.1:4173",
   appBaseUrl: process.env.APP_BASE_URL || process.env.CLIENT_URL?.split(",")[0]?.trim() || "http://127.0.0.1:4173",
-  clientUrls: (process.env.CLIENT_URL || "http://127.0.0.1:4173")
-    .split(",")
-    .map((value) => value.trim())
-    .filter(Boolean),
+  clientUrls: [
+    process.env.CLIENT_URL,
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
+    "http://127.0.0.1:4173",
+    "http://localhost:4173",
+    "http://localhost:5173",
+  ]
+    .filter(Boolean)
+    .flatMap((val) => val.split(",").map((v) => v.trim())),
   enableDevResetLink: process.env.ENABLE_DEV_RESET_LINK === "true",
   mailFrom: process.env.MAIL_FROM || "",
   smtpHost: process.env.SMTP_HOST || "",
