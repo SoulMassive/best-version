@@ -55,19 +55,26 @@ export function createApp() {
   app.use("/api", apiRouter);
 
   // Serve static files from the frontend/dist directory
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  const distPath = path.join(__dirname, "../../frontend/dist");
+  // Skip this on Vercel as it handles static files via vercel.json rewrites
+  if (!process.env.VERCEL) {
+    try {
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = path.dirname(__filename);
+      const distPath = path.join(__dirname, "../../frontend/dist");
 
-  if (fs.existsSync(distPath)) {
-    app.use(express.static(distPath));
-    app.get("*", (req, res, next) => {
-      // If it's an API route, let it fall through to notFound/errorHandler
-      if (req.path.startsWith("/api")) {
-        return next();
+      if (fs.existsSync(distPath)) {
+        app.use(express.static(distPath));
+        app.get("*", (req, res, next) => {
+          // If it's an API route, let it fall through to notFound/errorHandler
+          if (req.path.startsWith("/api")) {
+            return next();
+          }
+          res.sendFile(path.join(distPath, "index.html"));
+        });
       }
-      res.sendFile(path.join(distPath, "index.html"));
-    });
+    } catch (error) {
+      console.warn("Static file serving initialization failed:", error);
+    }
   }
 
   app.use(notFound);

@@ -1,7 +1,8 @@
 {
   "version": 2,
   "buildCommand": "npm run build",
-  "installCommand": "npm install && npm --prefix backend install",
+  "installCommand": "npm install && npm --prefix backend install && npm --prefix frontend install",
+  "outputDirectory": "frontend/dist",
   "functions": {
     "api/*.js": {
       "includeFiles": ["backend/src/**"]
@@ -9,7 +10,6 @@
   },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index.js" },
-    { "source": "/assets/(.*)", "destination": "/frontend/dist/assets/$1" },
-    { "source": "/(.*)", "destination": "/frontend/dist/index.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
