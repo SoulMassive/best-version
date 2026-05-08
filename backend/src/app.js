@@ -3,6 +3,9 @@ import express from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import morgan from "morgan";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
 import { env } from "./config/env.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
 import { router as apiRouter } from "./routes/index.js";
@@ -50,6 +53,22 @@ export function createApp() {
   });
 
   app.use("/api", apiRouter);
+
+  // Serve static files from the frontend/dist directory
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const distPath = path.join(__dirname, "../../frontend/dist");
+
+  if (fs.existsSync(distPath)) {
+    app.use(express.static(distPath));
+    app.get("*", (req, res, next) => {
+      // If it's an API route, let it fall through to notFound/errorHandler
+      if (req.path.startsWith("/api")) {
+        return next();
+      }
+      res.sendFile(path.join(distPath, "index.html"));
+    });
+  }
 
   app.use(notFound);
   app.use(errorHandler);
